@@ -1,14 +1,16 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Test from "./components/test";
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import Login from './pages/Login'
+import Register from './pages/Register'
 
 function App() {
-  return (
-  <BrowserRouter>
-    <Routes>
-      <Route path= '/' element={<Test/>}/>
-    </Routes>
-  </BrowserRouter>
-  );
+    return (
+        <BrowserRouter>
+            <Routes>
+                <Route path="/" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+            </Routes>
+        </BrowserRouter>
+    )
 }
 
-export default App;
+export default App
