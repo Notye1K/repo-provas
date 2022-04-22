@@ -25,7 +25,7 @@ const Container = styled.div`
     }
 
     .input {
-        margin: 5px 0;
+        width: 100%;
     }
 
     .bottomDiv {

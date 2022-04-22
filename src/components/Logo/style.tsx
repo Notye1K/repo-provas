@@ -7,11 +7,11 @@ const Container = styled.div`
     justify-content: center;
     align-items: center;
 
-    img{
+    img {
         margin-right: 10.5px;
     }
-    
-    span{
+
+    span {
         font-family: 'Lexend';
         font-style: normal;
         font-weight: 700;
@@ -19,8 +19,8 @@ const Container = styled.div`
         line-height: 45px;
         color: #000000;
     }
-    .provas{
-        color: #3F61D7;
+    .provas {
+        color: #3f61d7;
     }
 `
 
