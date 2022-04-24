@@ -89,11 +89,13 @@ export default function Tests() {
     const [terms, setTerms] = useState<Term[] | never[]>([])
     const [teachers, setTeachers] = useState<GetTeacher[] | never[]>([])
     const [textSearchBar, setTextSearchBar] = useState('Disciplina')
+    const [loading, setLoading] = useState(false)
 
     useEffect(() => {
         const token = localStorage.getItem('token')
         if (!token) navigate('/')
 
+        setLoading(true)
         getByDisciplines()
     }, [])
 
@@ -105,6 +107,7 @@ export default function Tests() {
             getByDisciplines()
         } else if (number === 2) {
             setTextSearchBar('Pessoa Instrutora')
+            setLoading(true)
             getTeachers()
                 .then((response) => {
                     setTeachers(response.data)
@@ -112,6 +115,7 @@ export default function Tests() {
                 .catch((error) => {
                     console.log(error.response?.data)
                 })
+                .finally(() => setLoading(false))
         }
     }
 
@@ -123,6 +127,7 @@ export default function Tests() {
             .catch((error) => {
                 console.log(error.response?.data)
             })
+            .finally(() => setLoading(false))
     }
 
     return (
@@ -177,79 +182,91 @@ export default function Tests() {
                                 ))
                             ) : (
                                 <Typography className="empty">
-                                    Nenhum periodo foi adicionado
+                                    {loading
+                                        ? 'Carregando ...'
+                                        : 'Nenhum periodo foi adicionado'}
                                 </Typography>
                             )}
                         </Div>
                     ) : button === 2 ? (
                         <Div>
-                            {teachers.map((teacher) => (
-                                <Accordion>
-                                    <AccordionSummary
-                                        expandIcon={<ExpandMoreIcon />}
-                                        aria-controls="panel1a-content"
-                                        id="panel1a-header"
-                                    >
-                                        <Typography className="term">
-                                            {teacher.name}
-                                        </Typography>
-                                    </AccordionSummary>
-                                    <AccordionDetails>
-                                        {teacher.categories?.length > 0 ? (
-                                            teacher.categories.map(
-                                                (category) => (
-                                                    <>
-                                                        <Typography className="category">
-                                                            {category.name}
-                                                        </Typography>
-                                                        {category.tests.map(
-                                                            (test) => (
-                                                                <a
-                                                                    href={
-                                                                        test.pdfUrl
-                                                                    }
-                                                                    key={
-                                                                        test.id
-                                                                    }
-                                                                >
-                                                                    <Typography className="test">
-                                                                        {test.createdAt
-                                                                            .slice(
-                                                                                0,
-                                                                                7
-                                                                            )
-                                                                            .replace(
-                                                                                '-',
-                                                                                '.'
-                                                                            )}
-                                                                        {' - '}
-                                                                        {
-                                                                            test.name
-                                                                        }{' '}
-                                                                        (
-                                                                        {
-                                                                            test
-                                                                                .teacherDiscipline
-                                                                                .discipline
-                                                                                .name
-                                                                        }
-                                                                        )
-                                                                    </Typography>
-                                                                </a>
-                                                            )
-                                                        )}
-                                                    </>
-                                                )
-                                            )
-                                        ) : (
-                                            <Typography>
-                                                Não foi adicionado nenhuma
-                                                categoria
+                            {teachers.length > 0 ? (
+                                teachers.map((teacher) => (
+                                    <Accordion>
+                                        <AccordionSummary
+                                            expandIcon={<ExpandMoreIcon />}
+                                            aria-controls="panel1a-content"
+                                            id="panel1a-header"
+                                        >
+                                            <Typography className="term">
+                                                {teacher.name}
                                             </Typography>
-                                        )}
-                                    </AccordionDetails>
-                                </Accordion>
-                            ))}
+                                        </AccordionSummary>
+                                        <AccordionDetails>
+                                            {teacher.categories?.length > 0 ? (
+                                                teacher.categories.map(
+                                                    (category) => (
+                                                        <>
+                                                            <Typography className="category">
+                                                                {category.name}
+                                                            </Typography>
+                                                            {category.tests.map(
+                                                                (test) => (
+                                                                    <a
+                                                                        href={
+                                                                            test.pdfUrl
+                                                                        }
+                                                                        key={
+                                                                            test.id
+                                                                        }
+                                                                    >
+                                                                        <Typography className="test">
+                                                                            {test.createdAt
+                                                                                .slice(
+                                                                                    0,
+                                                                                    7
+                                                                                )
+                                                                                .replace(
+                                                                                    '-',
+                                                                                    '.'
+                                                                                )}
+                                                                            {
+                                                                                ' - '
+                                                                            }
+                                                                            {
+                                                                                test.name
+                                                                            }{' '}
+                                                                            (
+                                                                            {
+                                                                                test
+                                                                                    .teacherDiscipline
+                                                                                    .discipline
+                                                                                    .name
+                                                                            }
+                                                                            )
+                                                                        </Typography>
+                                                                    </a>
+                                                                )
+                                                            )}
+                                                        </>
+                                                    )
+                                                )
+                                            ) : (
+                                                <Typography>
+                                                    Não foi adicionado nenhuma
+                                                    categoria
+                                                </Typography>
+                                            )}
+                                        </AccordionDetails>
+                                    </Accordion>
+                                ))
+                            ) : (
+                                <Typography className="empty">
+                                    {loading
+                                        ? 'Carregando ...'
+                                        : 'Nenhum professor foi adicionado'}
+                                </Typography>
+                            )}
                         </Div>
                     ) : (
                         'criar'
@@ -283,8 +300,10 @@ function SimpleAccordion({
 
 function InnerAccordion({ discipline }: { discipline: Discipline }) {
     const [categories, setCategories] = useState([])
+    const [loading, setLoading] = useState(false)
 
     useEffect(() => {
+        setLoading(true)
         getTests(discipline.id)
             .then((response) => {
                 setCategories(response.data)
@@ -292,6 +311,7 @@ function InnerAccordion({ discipline }: { discipline: Discipline }) {
             .catch((error) => {
                 console.log(error.response)
             })
+            .finally(() => setLoading(false))
     }, [])
 
     return (
@@ -327,7 +347,9 @@ function InnerAccordion({ discipline }: { discipline: Discipline }) {
                     )
                 ) : (
                     <Typography>
-                        Não foi adicionado nenhuma categoria
+                        {loading
+                            ? 'Carregando ...'
+                            : 'Não foi adicionado nenhuma categoria'}
                     </Typography>
                 )}
             </AccordionDetails>

@@ -152,7 +152,6 @@ export default function LoginRegisterBox({ type }: { type: string }) {
                         size="small"
                         type="submit"
                         loading={loading}
-                        loadingIndicator="Loading..."
                         variant="outlined"
                     >
                         {buttonText}
