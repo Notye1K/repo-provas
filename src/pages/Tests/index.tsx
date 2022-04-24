@@ -11,7 +11,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Header from '../../components/Header'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import { getTerms, getTests } from '../../services/testsService'
+import { getTeachers, getTerms, getTests } from '../../services/testsService'
 import Div from './style'
 
 interface Term {
@@ -61,11 +61,34 @@ interface GetCategory {
     tests: Test[]
 }
 
+interface GetTeacher {
+    id: number
+    name: string
+    categories: TeacherCategory[]
+}
+
+interface TeacherCategory {
+    name: string
+    tests: TeacherTest[]
+}
+
+interface TeacherTest {
+    id: number
+    name: string
+    pdfUrl: string
+    categoryId: number
+    teacherDisciplineId: number
+    createdAt: string
+    teacherDiscipline: TeacherDiscipline & { discipline: Discipline }
+}
+
 export default function Tests() {
     const navigate = useNavigate()
 
     const [button, setButton] = useState(1)
     const [terms, setTerms] = useState<Term[] | never[]>([])
+    const [teachers, setTeachers] = useState<GetTeacher[] | never[]>([])
+    const [textSearchBar, setTextSearchBar] = useState('Disciplina')
 
     useEffect(() => {
         const token = localStorage.getItem('token')
@@ -78,7 +101,17 @@ export default function Tests() {
         if (number === button) return
         setButton(number)
         if (number === 1) {
+            setTextSearchBar('Disciplina')
             getByDisciplines()
+        } else if (number === 2) {
+            setTextSearchBar('Pessoa Instrutora')
+            getTeachers()
+                .then((response) => {
+                    setTeachers(response.data)
+                })
+                .catch((error) => {
+                    console.log(error.response?.data)
+                })
         }
     }
 
@@ -94,7 +127,7 @@ export default function Tests() {
 
     return (
         <>
-            <Header text="Disciplina" />
+            <Header text={textSearchBar} />
             <Container maxWidth="md">
                 <Box display="flex" justifyContent="space-between" mt={4}>
                     <Button
@@ -120,23 +153,107 @@ export default function Tests() {
                     </Button>
                 </Box>
                 <Box mt={4}>
-                    <Div>
-                        {(terms as Term[]).map((term: Term) => (
-                            <SimpleAccordion term={term}>
-                                {term.disciplines.length > 0 ? (
-                                    term.disciplines.map((discipline) => (
-                                        <InnerAccordion
-                                            discipline={discipline}
-                                        />
-                                    ))
-                                ) : (
-                                    <Typography>
-                                        Não foi adicionado nenhuma disciplina
-                                    </Typography>
-                                )}
-                            </SimpleAccordion>
-                        ))}
-                    </Div>
+                    {button === 1 ? (
+                        <Div>
+                            {terms.length > 0 ? (
+                                (terms as Term[]).map((term: Term) => (
+                                    <SimpleAccordion term={term} key={term.id}>
+                                        {term.disciplines.length > 0 ? (
+                                            term.disciplines.map(
+                                                (discipline) => (
+                                                    <InnerAccordion
+                                                        discipline={discipline}
+                                                        key={discipline.id}
+                                                    />
+                                                )
+                                            )
+                                        ) : (
+                                            <Typography>
+                                                Não foi adicionado nenhuma
+                                                disciplina
+                                            </Typography>
+                                        )}
+                                    </SimpleAccordion>
+                                ))
+                            ) : (
+                                <Typography className="empty">
+                                    Nenhum periodo foi adicionado
+                                </Typography>
+                            )}
+                        </Div>
+                    ) : button === 2 ? (
+                        <Div>
+                            {teachers.map((teacher) => (
+                                <Accordion>
+                                    <AccordionSummary
+                                        expandIcon={<ExpandMoreIcon />}
+                                        aria-controls="panel1a-content"
+                                        id="panel1a-header"
+                                    >
+                                        <Typography className="term">
+                                            {teacher.name}
+                                        </Typography>
+                                    </AccordionSummary>
+                                    <AccordionDetails>
+                                        {teacher.categories?.length > 0 ? (
+                                            teacher.categories.map(
+                                                (category) => (
+                                                    <>
+                                                        <Typography className="category">
+                                                            {category.name}
+                                                        </Typography>
+                                                        {category.tests.map(
+                                                            (test) => (
+                                                                <a
+                                                                    href={
+                                                                        test.pdfUrl
+                                                                    }
+                                                                    key={
+                                                                        test.id
+                                                                    }
+                                                                >
+                                                                    <Typography className="test">
+                                                                        {test.createdAt
+                                                                            .slice(
+                                                                                0,
+                                                                                7
+                                                                            )
+                                                                            .replace(
+                                                                                '-',
+                                                                                '.'
+                                                                            )}
+                                                                        {' - '}
+                                                                        {
+                                                                            test.name
+                                                                        }{' '}
+                                                                        (
+                                                                        {
+                                                                            test
+                                                                                .teacherDiscipline
+                                                                                .discipline
+                                                                                .name
+                                                                        }
+                                                                        )
+                                                                    </Typography>
+                                                                </a>
+                                                            )
+                                                        )}
+                                                    </>
+                                                )
+                                            )
+                                        ) : (
+                                            <Typography>
+                                                Não foi adicionado nenhuma
+                                                categoria
+                                            </Typography>
+                                        )}
+                                    </AccordionDetails>
+                                </Accordion>
+                            ))}
+                        </Div>
+                    ) : (
+                        'criar'
+                    )}
                 </Box>
             </Container>
         </>
@@ -195,13 +312,15 @@ function InnerAccordion({ discipline }: { discipline: Discipline }) {
                                     {category.categoryName}
                                 </Typography>
                                 {category.tests.map((test) => (
-                                    <Typography className="test">
-                                        {test.createdAt
-                                            .slice(0, 7)
-                                            .replace('-', '.')}
-                                        {' - '}
-                                        {test.name} ({test.teacherName})
-                                    </Typography>
+                                    <a href={test.pdfUrl} key={test.id}>
+                                        <Typography className="test">
+                                            {test.createdAt
+                                                .slice(0, 7)
+                                                .replace('-', '.')}
+                                            {' - '}
+                                            {test.name} ({test.teacherName})
+                                        </Typography>
+                                    </a>
                                 ))}
                             </>
                         )

@@ -17,6 +17,7 @@ import Container from './style'
 import { VisibilityOffSharp, VisibilitySharp } from '@mui/icons-material'
 import { Link, useNavigate } from 'react-router-dom'
 import { login, register } from '../../services/userAuth'
+import { LoadingButton } from '@mui/lab'
 
 export interface Form {
     email: string
@@ -45,15 +46,22 @@ export default function LoginRegisterBox({ type }: { type: string }) {
     const [open, setOpen] = useState(false)
     const [errorMessage, setErrorMesage] = useState('Erro')
 
+    const [loading, setLoading] = useState(false)
+
     function handleClickSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault()
+
+        setLoading(true)
 
         const { confirmPassword, ...rest } = form
         if (type === 'login') {
             tryLogin(rest)
         } else {
             const match = checkPasswords(form.password, form.confirmPassword)
-            if (!match) return
+            if (!match) {
+                setLoading(false)
+                return
+            }
 
             tryRegister(rest)
         }
@@ -69,6 +77,9 @@ export default function LoginRegisterBox({ type }: { type: string }) {
                 setOpen(true)
                 setErrorMesage(error.response?.data)
             })
+            .finally(() => {
+                setLoading(false)
+            })
     }
 
     function tryLogin(rest: { email: string; password: string }) {
@@ -81,6 +92,9 @@ export default function LoginRegisterBox({ type }: { type: string }) {
             .catch((error) => {
                 setOpen(true)
                 setErrorMesage(error.response?.data)
+            })
+            .finally(() => {
+                setLoading(false)
             })
     }
 
@@ -134,9 +148,15 @@ export default function LoginRegisterBox({ type }: { type: string }) {
                         <span>{spanText}</span>
                     </Link>
 
-                    <Button type="submit" variant="contained">
+                    <LoadingButton
+                        size="small"
+                        type="submit"
+                        loading={loading}
+                        loadingIndicator="Loading..."
+                        variant="outlined"
+                    >
                         {buttonText}
-                    </Button>
+                    </LoadingButton>
                 </div>
             </form>
         </Container>

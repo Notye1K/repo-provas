@@ -20,3 +20,8 @@ export function getTests(disciId: number) {
     const promise = axios.get(api + `/tests/disciplines/${disciId}`, config)
     return promise
 }
+
+export function getTeachers() {
+    const promise = axios.get(api + `/tests/teachers`, config)
+    return promise
+}

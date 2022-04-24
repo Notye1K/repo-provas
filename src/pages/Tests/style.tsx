@@ -16,6 +16,20 @@ const Div = styled.div`
     }
     .test {
         color: gray;
+        &:hover {
+            color: #6a6ad7;
+        }
+    }
+    .empty {
+        display: flex;
+        justify-content: center;
+
+        margin-top: 2em;
+
+        font-size: 3em;
+    }
+    a {
+        text-decoration: none;
     }
 `
 
