@@ -16,7 +16,7 @@ const Container = styled.div`
     .or {
         margin: 0 5px;
 
-        font-family: 'Poppins';
+        font-family: 'Poppins', sans-serif;
         font-style: normal;
         font-weight: 500;
         font-size: 12px;

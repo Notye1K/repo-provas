@@ -9,7 +9,7 @@ export default function Register() {
     useEffect(() => {
         const token = localStorage.getItem('token')
         if (token) navigate('/tests')
-    })
+    },[])
 
     return (
         <>

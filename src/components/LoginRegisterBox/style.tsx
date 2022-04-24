@@ -15,7 +15,7 @@ const Container = styled.div`
         justify-content: center;
         align-items: center;
 
-        font-family: 'Poppins';
+        font-family: 'Poppins', sans-serif;
         font-style: normal;
         font-weight: 500;
         font-size: 24px;
@@ -36,7 +36,7 @@ const Container = styled.div`
         margin-top: 10px;
 
         span {
-            font-family: 'Poppins';
+            font-family: 'Poppins', sans-serif;
             font-style: normal;
             font-weight: 500;
             font-size: 12px;
