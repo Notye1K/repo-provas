@@ -31,6 +31,12 @@ const Div = styled.div`
     a {
         text-decoration: none;
     }
+
+    @media (max-width: 500px) {
+        .empty{
+            font-size: 18px;
+        }
+    }
 `
 
 export default Div

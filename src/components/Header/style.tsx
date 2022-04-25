@@ -26,6 +26,12 @@ const Container = styled.div`
     .input {
         width: 50%;
     }
+
+    @media (max-width: 500px) {
+        .logout{
+            width: 20px;
+        }
+    }
 `
 
 export default Container

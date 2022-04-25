@@ -1,10 +1,10 @@
 import styled from 'styled-components'
 
 const Container = styled.div`
-    width: 464px;
+    width: 50%;
     height: 328px;
     margin: 0 auto;
-    margin-top: 238px;
+    margin-top: 15%;
 
     display: flex;
     flex-direction: column;
@@ -44,6 +44,17 @@ const Container = styled.div`
             letter-spacing: 0.15px;
             text-decoration-line: underline;
             color: rgba(70, 115, 202, 0.8);
+        }
+    }
+    @media (max-width: 500px) {
+        .title {
+            font-size: 18px;
+            line-height: 16px;
+        }
+
+        .input {
+            height: 44px;
+            font-size: 10px !important;
         }
     }
 `
