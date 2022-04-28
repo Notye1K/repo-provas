@@ -12,8 +12,15 @@ import Line from '../Line'
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 
-export default function Header({ text }: { text: string }) {
+export default function Header({
+    text,
+    search,
+}: {
+    text: string
+    search: Function
+}) {
     const [open, setOpen] = useState(false)
+    const [value, setValue] = useState('')
 
     const handleClickOpen = () => {
         setOpen(true)
@@ -28,6 +35,16 @@ export default function Header({ text }: { text: string }) {
         handleClose()
         localStorage.removeItem('token')
         navigate('/')
+    }
+
+    function handleInput(e: React.ChangeEvent<HTMLTextAreaElement>) {
+        setValue(e.target.value)
+    }
+
+    function handleKeyDown(e: React.KeyboardEvent<HTMLDivElement>) {
+        if (e.key === 'Enter') {
+            search(value, text)
+        }
     }
 
     return (
@@ -48,6 +65,9 @@ export default function Header({ text }: { text: string }) {
                         label={`Pesquise por ${text}`}
                         variant="outlined"
                         className="input"
+                        onChange={handleInput}
+                        value={value}
+                        onKeyDown={handleKeyDown}
                     />
                 </div>
             </Container>

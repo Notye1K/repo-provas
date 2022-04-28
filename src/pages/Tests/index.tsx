@@ -130,9 +130,26 @@ export default function Tests() {
             .finally(() => setLoading(false))
     }
 
+    function search(value: string, type: string) {
+        if (type === 'Pessoa Instrutora') setExpandedTeacher(value)
+        else setExpandedDisciplines(value)
+    }
+
+    const [expandedTeacher, setExpandedTeacher] = useState<string | false>(
+        false
+    )
+    const [expandedDisciplines, setExpandedDisciplines] = useState<
+        string | false
+    >(false)
+    const handleChangeTeacher =
+        (panel: string) =>
+        (event: React.SyntheticEvent, isExpanded: boolean) => {
+            setExpandedTeacher(isExpanded ? panel : false)
+        }
+
     return (
         <>
-            <Header text={textSearchBar} />
+            <Header text={textSearchBar} search={search} />
             <Container maxWidth="md">
                 <Box display="flex" justifyContent="space-between" mt={4}>
                     <Button
@@ -162,23 +179,13 @@ export default function Tests() {
                         <Div>
                             {terms.length > 0 ? (
                                 (terms as Term[]).map((term: Term) => (
-                                    <SimpleAccordion term={term} key={term.id}>
-                                        {term.disciplines.length > 0 ? (
-                                            term.disciplines.map(
-                                                (discipline) => (
-                                                    <InnerAccordion
-                                                        discipline={discipline}
-                                                        key={discipline.id}
-                                                    />
-                                                )
-                                            )
-                                        ) : (
-                                            <Typography>
-                                                Não foi adicionado nenhuma
-                                                disciplina
-                                            </Typography>
-                                        )}
-                                    </SimpleAccordion>
+                                    <SimpleAccordion
+                                        term={term}
+                                        key={term.id}
+                                        expandedDisciplines={
+                                            expandedDisciplines
+                                        }
+                                    ></SimpleAccordion>
                                 ))
                             ) : (
                                 <Typography className="empty">
@@ -192,7 +199,14 @@ export default function Tests() {
                         <Div>
                             {teachers.length > 0 ? (
                                 teachers.map((teacher) => (
-                                    <Accordion>
+                                    <Accordion
+                                        expanded={
+                                            expandedTeacher === teacher.name
+                                        }
+                                        onChange={handleChangeTeacher(
+                                            teacher.name
+                                        )}
+                                    >
                                         <AccordionSummary
                                             expandIcon={<ExpandMoreIcon />}
                                             aria-controls="panel1a-content"
@@ -278,14 +292,30 @@ export default function Tests() {
 }
 
 function SimpleAccordion({
-    children,
     term,
+    expandedDisciplines,
 }: {
-    children: JSX.Element[] | JSX.Element
     term: Term
+    expandedDisciplines: string | false
 }) {
+    const [expandedTerm, setExpandedTerm] = useState<number | false>(false)
+
+    const handleChange =
+        (panel: number) =>
+        (event: React.SyntheticEvent, isExpanded: boolean) => {
+            setExpandedTerm(isExpanded ? panel : false)
+        }
+
     return (
-        <Accordion>
+        <Accordion
+            expanded={
+                expandedTerm === term.number ||
+                !!term.disciplines.find(
+                    (v) => v.name === expandedDisciplines && expandedTerm === -1
+                )
+            }
+            onChange={handleChange(term.number)}
+        >
             <AccordionSummary
                 expandIcon={<ExpandMoreIcon />}
                 aria-controls="panel1a-content"
@@ -293,14 +323,57 @@ function SimpleAccordion({
             >
                 <Typography className="term">{`${term.number}º Periodo`}</Typography>
             </AccordionSummary>
-            <AccordionDetails>{children}</AccordionDetails>
+            <AccordionDetails>
+                {term.disciplines.length > 0 ? (
+                    term.disciplines.map((discipline) => (
+                        <InnerAccordion
+                            discipline={discipline}
+                            key={discipline.id}
+                            expandedDisciplines={expandedDisciplines}
+                            setExpandedTerm={setExpandedTerm}
+                            term={term.number}
+                        />
+                    ))
+                ) : (
+                    <Typography>
+                        Não foi adicionado nenhuma disciplina
+                    </Typography>
+                )}
+            </AccordionDetails>
         </Accordion>
     )
 }
 
-function InnerAccordion({ discipline }: { discipline: Discipline }) {
+function InnerAccordion({
+    discipline,
+    expandedDisciplines,
+    setExpandedTerm,
+    term,
+}: {
+    discipline: Discipline
+    expandedDisciplines: string | false
+    setExpandedTerm: React.Dispatch<React.SetStateAction<number | false>>
+    term: number
+}) {
     const [categories, setCategories] = useState([])
     const [loading, setLoading] = useState(false)
+
+    const [expanded, setExpanded] = useState<string | false>(
+        expandedDisciplines
+    )
+
+    useEffect(() => {
+        setExpanded(expandedDisciplines)
+        if (expandedDisciplines === discipline.name) {
+            setExpandedTerm(term)
+        } else setExpandedTerm(-1)
+    }, [expandedDisciplines])
+
+    const handleChange =
+        (panel: string) =>
+        (event: React.SyntheticEvent, isExpanded: boolean) => {
+            setExpanded(isExpanded ? panel : false)
+        }
 
     useEffect(() => {
         setLoading(true)
@@ -315,11 +388,14 @@ function InnerAccordion({ discipline }: { discipline: Discipline }) {
     }, [])
 
     return (
-        <Accordion>
+        <Accordion
+            expanded={expanded === discipline.name}
+            onChange={handleChange(discipline.name)}
+        >
             <AccordionSummary
                 expandIcon={<ExpandMoreIcon />}
                 aria-controls="panel1a-content"
-                id="panel1a-header"
+                id={`panel1a-header`}
             >
                 <Typography className="disci">{discipline.name}</Typography>
             </AccordionSummary>
@@ -333,7 +409,10 @@ function InnerAccordion({ discipline }: { discipline: Discipline }) {
                                 </Typography>
                                 {category.tests.map((test) => (
                                     <a href={test.pdfUrl} key={test.id}>
-                                        <Typography className="test">
+                                        <Typography
+                                            className="test"
+                                            key={test.name}
+                                        >
                                             {test.createdAt
                                                 .slice(0, 7)
                                                 .replace('-', '.')}
