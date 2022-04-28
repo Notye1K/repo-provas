@@ -48,7 +48,9 @@
     ]
   },
   "devDependencies": {
+    "@faker-js/faker": "^6.2.0",
     "@types/styled-components": "^5.1.25",
+    "cypress": "^9.6.0",
     "typescript-styled-plugin": "^0.18.2"
   }
 }
