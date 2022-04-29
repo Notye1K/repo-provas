@@ -25,3 +25,7 @@ export function getTeachers() {
     const promise = axios.get(api + `/tests/teachers`, config())
     return promise
 }
+
+export function incViews(testId: number) {
+    axios.patch(api + `/tests/${testId}`, {}, config())
+}

@@ -11,7 +11,12 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Header from '../../components/Header'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import { getTeachers, getTerms, getTests } from '../../services/testsService'
+import {
+    getTeachers,
+    getTerms,
+    getTests,
+    incViews,
+} from '../../services/testsService'
 import Div from './style'
 
 interface Term {
@@ -41,6 +46,7 @@ interface Test {
     createdAt: string
     category: Category
     teacherName?: string
+    views: number
 }
 
 interface Teacher {
@@ -80,6 +86,7 @@ interface TeacherTest {
     teacherDisciplineId: number
     createdAt: string
     teacherDiscipline: TeacherDiscipline & { discipline: Discipline }
+    views: number
 }
 
 export default function Tests() {
@@ -227,11 +234,17 @@ export default function Tests() {
                                                             {category.tests.map(
                                                                 (test) => (
                                                                     <a
+                                                                        target="_blank"
                                                                         href={
                                                                             test.pdfUrl
                                                                         }
                                                                         key={
                                                                             test.id
+                                                                        }
+                                                                        onClick={() =>
+                                                                            incViews(
+                                                                                test.id
+                                                                            )
                                                                         }
                                                                     >
                                                                         <Typography className="test">
@@ -257,7 +270,11 @@ export default function Tests() {
                                                                                     .discipline
                                                                                     .name
                                                                             }
-                                                                            )
+                                                                            ) -
+                                                                            views:{' '}
+                                                                            {
+                                                                                test.views
+                                                                            }
                                                                         </Typography>
                                                                     </a>
                                                                 )
@@ -408,7 +425,12 @@ function InnerAccordion({
                                     {category.categoryName}
                                 </Typography>
                                 {category.tests.map((test) => (
-                                    <a href={test.pdfUrl} key={test.id}>
+                                    <a
+                                        target="_blank"
+                                        href={test.pdfUrl}
+                                        key={test.id}
+                                        onClick={() => incViews(test.id)}
+                                    >
                                         <Typography
                                             className="test"
                                             key={test.name}
@@ -417,7 +439,8 @@ function InnerAccordion({
                                                 .slice(0, 7)
                                                 .replace('-', '.')}
                                             {' - '}
-                                            {test.name} ({test.teacherName})
+                                            {test.name} ({test.teacherName}) -
+                                            views: {test.views}
                                         </Typography>
                                     </a>
                                 ))}

@@ -4,7 +4,7 @@ import { faker } from '@faker-js/faker'
 
 const body = {
     password: faker.internet.password(),
-    email: faker.internet.email()
+    email: faker.internet.email(),
 }
 
 beforeEach(() => {
@@ -13,7 +13,6 @@ beforeEach(() => {
 
 describe('repoProvas app', () => {
     it('full test', () => {
-
         cy.contains('Não possuo cadastro').click()
 
         cy.url().should('equal', 'http://localhost:3000/register')
@@ -47,7 +46,6 @@ describe('repoProvas app', () => {
 
         cy.get('.logout').click()
         cy.contains('Sim').click()
-
     })
 
     it('wrong login', () => {
@@ -83,7 +81,5 @@ describe('repoProvas app', () => {
         cy.contains('"email" must be a valid email')
 
         cy.url().should('equal', 'http://localhost:3000/register')
-
-
     })
 })
