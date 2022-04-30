@@ -18,6 +18,7 @@ import {
     incViews,
 } from '../../services/testsService'
 import Div from './style'
+import CreateTest from '../../components/CreateTest'
 
 interface Term {
     id: number
@@ -123,6 +124,8 @@ export default function Tests() {
                     console.log(error.response?.data)
                 })
                 .finally(() => setLoading(false))
+        } else {
+            setTextSearchBar('Create')
         }
     }
 
@@ -300,7 +303,7 @@ export default function Tests() {
                             )}
                         </Div>
                     ) : (
-                        'criar'
+                        <CreateTest />
                     )}
                 </Box>
             </Container>

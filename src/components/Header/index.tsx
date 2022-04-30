@@ -6,6 +6,7 @@ import {
     DialogActions,
     DialogTitle,
     TextField,
+    Typography,
 } from '@mui/material'
 import Container from './style'
 import Line from '../Line'
@@ -60,15 +61,19 @@ export default function Header({
                     />
                 </div>
                 <div className="bottomDiv">
-                    <TextField
-                        id="ioutlned-basic"
-                        label={`Pesquise por ${text}`}
-                        variant="outlined"
-                        className="input"
-                        onChange={handleInput}
-                        value={value}
-                        onKeyDown={handleKeyDown}
-                    />
+                    {text === 'Create' ? (
+                        <Typography variant="h6">Adicione uma prova</Typography>
+                    ) : (
+                        <TextField
+                            id="ioutlned-basic"
+                            label={`Pesquise por ${text}`}
+                            variant="outlined"
+                            className="input"
+                            onChange={handleInput}
+                            value={value}
+                            onKeyDown={handleKeyDown}
+                        />
+                    )}
                 </div>
             </Container>
             <Line />
